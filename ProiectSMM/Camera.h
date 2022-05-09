@@ -51,24 +51,26 @@ protected:
     float lastX = 0.f, lastY = 0.f;
 
 public:
-    enum EMovementType {
-        EUnknown,
-        EForward,
-        EBackward,
-        ERight,
-        ELeft,
-        EPageUp,
-        EPageDown
+    enum EMovementType
+    {
+        UNKNOWN,
+        FORWARD,
+        BACKWARD,
+        LEFT,
+        RIGHT,
+        UP,
+        DOWN
     };
-
     Camera(const int width, const int height, const glm::vec3& position);
     void Set(const int width, const int height, const glm::vec3& position);
     const glm::mat4 GetViewMatrix() const;
     const glm::mat4 GetProjectionMatrix() const;
+    const glm::vec3 GetPosition() const;
     void ProcessKeyboard(EMovementType movementType, float deltaTime);
     void MouseControl(float xPos, float yPos);
     void ProcessMouseScroll(float yOffset);
     void Reshape(int width, int height);
+    void Reset(const int width, const int height);
 
 private:
     void ProcessMouseMovement(float xOffset, float yOffset, bool constrainPitch = true);

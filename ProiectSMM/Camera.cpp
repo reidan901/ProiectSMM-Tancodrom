@@ -28,6 +28,11 @@ void Camera::Set(const int width, const int height, const glm::vec3& position)
     UpdateCameraVectors();
 }
 
+void Camera::Reset(const int width, const int height)
+{
+    Set(width, height, startPosition);
+}
+
 const glm::mat4 Camera::GetViewMatrix() const
 {
     return glm::lookAt(position, position + forward, up);
@@ -49,30 +54,35 @@ const glm::mat4 Camera::GetProjectionMatrix() const
     return Proj;
 }
 
+const glm::vec3 Camera::GetPosition() const
+{
+    return position;
+}
+
 void Camera::ProcessKeyboard(EMovementType movementType, float deltaTime)
 {
     float velocity = deltaTime * cameraSpeedFactor;
 
     switch (movementType)
     {
-    case Camera::EUnknown:
+    case Camera::UNKNOWN:
         break;
-    case Camera::EForward:
+    case Camera::FORWARD:
         this->position += this->forward * velocity;
         break;
-    case Camera::EBackward:
+    case Camera::BACKWARD:
         this->position -= this->forward * velocity;
         break;
-    case Camera::ERight:
+    case Camera::RIGHT:
         this->position += this->right * velocity;
         break;
-    case Camera::ELeft:
+    case Camera::LEFT:
         this->position -= this->right * velocity;
         break;
-    case Camera::EPageUp:
+    case Camera::UP:
         this->position += this->up * velocity;
         break;
-    case Camera::EPageDown:
+    case Camera::DOWN:
         this->position -= this->up * velocity;
         break;
     default:
