@@ -208,16 +208,16 @@ int main()
 	std::vector<std::vector<Mesh>> meshes;
 	std::vector<std::string> paths;
 	std::string pathname1 = "Tiger_I.obj";
-	std::string pathname2 = "field.obj";
-	//paths.push_back(pathname1);
+	std::string pathname2 = "Landscape-1.obj";
+	paths.push_back(pathname1);
 	paths.push_back(pathname2);
 	for (int i = 0; i < paths.size(); i++)
 	{
 		meshes.push_back(Loader::LoadObj( paths[i]));
 	}
 	
-	//Model myModel(meshes[0]);
-	Model model2(meshes[0]);
+	Model myModel(meshes[0]);
+	Model model2(meshes[1]);
 
 	// render loop
 	while (!glfwWindowShouldClose(window)) {
@@ -248,7 +248,7 @@ int main()
 
 		glm::mat4 model = glm::scale(glm::mat4(1.0), glm::vec3(33.0f));
 		lightingShader.SetMat4("model", model);
-		//myModel.Draw(lightingShader);
+		myModel.Draw(lightingShader);
 		model2.Draw(lightingShader);
 		//// render the cube
 		//glBindVertexArray(cubeVAO);
