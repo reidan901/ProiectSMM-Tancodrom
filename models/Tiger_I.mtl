@@ -1,3 +1,4 @@
+# Blender MTL File: 'Tiger_I.blend'
 # Material Count: 2
 
 newmtl Material_1
@@ -18,4 +19,4 @@ Ks 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd  C:\Users\UltraBook\Desktop\Anul_II\Semestrul_2\SMM\Laboratoare\ProiectSMM-Tancodrom\models\tank.hdr
+map_Kd C:\Users\UltraBook\Desktop\Anul_II\Semestrul_2\SMM\Laboratoare\ProiectSMM-Tancodrom\models\tank.hdr

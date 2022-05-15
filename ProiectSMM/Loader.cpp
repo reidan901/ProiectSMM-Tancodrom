@@ -4,11 +4,12 @@
 #include "TextureUtilities.h"
 #include <map>
 
-void Loader::LoadObj(std::vector<Mesh>& meshes)
+std::vector<Mesh> Loader::LoadObj(std::string& pathname)
 {
     objl::Loader loader;
-    loader.LoadFile("../models/tank.obj");
+    loader.LoadFile(pathname);
     std::vector<Material> materials;
+    std::vector<Mesh> toReturn;
     for (auto mat : loader.LoadedMaterials)
     {
         Material temp;
@@ -23,6 +24,7 @@ void Loader::LoadObj(std::vector<Mesh>& meshes)
             mat.Ks.Z);
         temp.shininess = mat.Ns;
         temp.name = mat.name;
+        if(mat.map_Kd!="")
         temp.textureID = TextureUtilites::LoadTexture(mat.map_Kd);
         materials.push_back(temp);
     }
@@ -51,6 +53,7 @@ void Loader::LoadObj(std::vector<Mesh>& meshes)
         for (int j = 0; j < materials.size(); j++)
             if (materials[j].name == loader.LoadedMeshes[k].MeshMaterial.name)
                 mesh.MeshMaterial = materials[j];
-        meshes.push_back(mesh);
+        toReturn.push_back(mesh);
     }
+    return toReturn;
 }
