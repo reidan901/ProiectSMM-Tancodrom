@@ -172,8 +172,8 @@ int main()
 	//Shader lampShader("Lamp.vs", "Lamp.fs");
 	std::vector<std::vector<Mesh>> meshes;
 	std::vector<std::string> paths;
-	std::string pathname1 = "../models/tank.obj";
-	std::string pathname2 = "../models/Landscape-1.obj";
+	std::string pathname1 = "Tiger-1.obj";
+	std::string pathname2 = "Landscape-1.obj";
 	paths.push_back(pathname1);
 	paths.push_back(pathname2);
 	for (int i = 0; i < paths.size(); i++)
@@ -252,7 +252,7 @@ int main()
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	glm::vec3 lightPos(1.0f, 1.0f, 2.0f);
+	glm::vec3 lightPos(0.0f, 1.0f, 0.0f);
 
 	//skybox
 	float skyboxVertices[] = {
@@ -335,6 +335,17 @@ int main()
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
+	glm::vec3 lightColor;
+	lightColor.x = 1;
+	lightColor.y = 1;
+	lightColor.z = 0;
+
+	double mixValue = 0.0;
+
+	GLuint MixValueLocation;
+	MixValueLocation = glGetUniformLocation(skyboxShader.ID, "mixValue");
+
+	glUniform1f(MixValueLocation, mixValue);
 	// render loop
 	while (!glfwWindowShouldClose(window)) {
 		// per-frame time logic
@@ -356,9 +367,10 @@ int main()
 
 		skyboxShader.SetMat4("projection", projectionSkybox);
 		skyboxShader.SetMat4("view", viewSkybox);
+		skyboxShader.SetFloat("mixValue", mixValue);
 		glUniform1i(glGetUniformLocation(skyboxShader.ID, "skybox"), 0);
 		glUniform1i(glGetUniformLocation(skyboxShader.ID, "skybox2"), 1);
-
+		//glUniform1f(glGetUniformLocation(skyboxShader.ID, "mixValue"), 0.0);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture1);
 		glActiveTexture(GL_TEXTURE1);
@@ -370,9 +382,9 @@ int main()
 		glDepthMask(GL_TRUE);
 		glActiveTexture(GL_TEXTURE0);
 
-		static double lightMovementRadius = 5.0f;
-		lightPos.x = lightMovementRadius * glm::sin(currentFrame);
-		lightPos.y = lightMovementRadius * glm::cos(currentFrame);
+		static double lightMovementRadius = 600.0f;
+		lightPos.y = lightMovementRadius * glm::sin(currentFrame*0.3);
+		lightPos.x = lightMovementRadius * glm::cos(currentFrame*0.3); 
 		//lamp
 		/*glBindVertexArray(cubeVAO);
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -385,7 +397,7 @@ int main()
 		glm::mat4 modelLight = glm::scale(glm::mat4(1.0), glm::vec3(3.0f));
 
 		modelLight = glm::translate(glm::mat4(1.0), lightPos);
-		modelLight = glm::translate(modelLight, glm::vec3(0, 110.f, 0.f));
+		//modelLight = glm::translate(modelLight, glm::vec3(0, 110.f, 0.f));
 		lampShader.SetMat4("model", modelLight);
 		
 		glBindVertexArray(lightVAO);
@@ -403,10 +415,66 @@ int main()
 		modelShader.SetMat4("model", model1);
 		modelShader.SetVec3("viewPos", pCamera->GetPosition());
 		// light properties
-		glm::vec3 lightColor;
-		lightColor.x = 1;
-		lightColor.y = 1;
-		lightColor.z = 1;
+		if (glm::cos(currentFrame * 0.3) < 1.f && glm::cos(currentFrame * 0.3) > 0.f )
+		{
+			if (mixValue < 0)
+			{
+				mixValue = 0;
+			}
+			else
+			{
+				mixValue -= 0.0001;
+			}
+
+			if (lightColor.x < 0.858)
+			{
+				lightColor.x = 0.858;
+			}
+			else
+			{
+				lightColor.x = lightColor.x - 0.0001;
+			}
+			
+			if (lightColor.y > 1)
+			{
+				lightColor.y = 1;
+			}
+			else
+			{
+				lightColor.y = lightColor.y + 0.0001;
+			}
+		}
+		else if(glm::cos(currentFrame * 0.3) > -1.f && glm::cos(currentFrame * 0.3) < 0.f)
+		{
+			if (mixValue > 1)
+			{
+				mixValue = 1;
+			}
+			else
+			{
+				mixValue += 0.0003;
+			}
+			
+
+			if (lightColor.x > 1)
+			{
+				lightColor.x = 1;
+			}
+			else
+			{
+				lightColor.x = lightColor.x + 0.0001;
+			}
+
+			if (lightColor.y < 0.466)
+			{
+				lightColor.y = 0.466;
+			}
+			else
+			{
+				lightColor.y = lightColor.y - 0.0001;
+			}
+		}
+		
 		glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f); // decrease the influence
 		glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // low influence
 		modelShader.SetVec3("light.ambient", ambientColor);

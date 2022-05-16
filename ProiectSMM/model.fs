@@ -27,7 +27,7 @@ uniform sampler2D Texture;
 
 void main()
 {
-    vec3 color = texture(Texture, TexCoords).rgb;
+    vec3 color = texture(Texture, TexCoords).xyz;
     vec3 ambient = light.ambient * material.ambient;
 
     vec3 norm = normalize(Normal);
@@ -40,7 +40,6 @@ void main()
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
     vec3 specular = light.specular * (spec * material.specular);  
         
-    vec3 result1 = ambient + diffuse + specular;
-    vec3 result =result1*color;
+    vec3 result = (ambient + diffuse)*color + specular;
     FragColor = vec4(result,1);
 } 
