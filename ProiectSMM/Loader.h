@@ -2,7 +2,7 @@
 #include <string>
 //#include <tiny_obj_loader.h>
 #include <iostream>
-#include <glm/glm.hpp>
+#include <glm.hpp>
 #include "Mesh.h"
 class Loader
 {

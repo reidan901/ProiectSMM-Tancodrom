@@ -14,14 +14,14 @@ uniform float n;
 uniform float Ks;
 
 void main()
-{	
-	vec3 norm=normalize(Normal);
-	vec3 lightDir=normalize(lightPos-FragPos);
-	vec3 viewDir=normalize(viewPos-FragPos);
-	vec3 reflectDir=reflect(-lightDir,norm);
-	vec3 ambient=Ka*lightColor;
-	float diff=Kd*max(dot(norm,lightDir),0.0);
-	float spec=Ks*pow(max(dot(viewDir,reflectDir),0.0),n);
-	vec3 result=(ambient+diff+spec)*objectColor;
-	FragColor = vec4(result, 1.0);
+{
+    vec3 norm=normalize(Normal);
+    vec3 lightDir=normalize(lightPos-FragPos);
+    vec3 viewDir=normalize(viewPos-FragPos);
+    vec3 reflectDir=reflect(-lightDir,norm);
+    vec3 ambient=Ka*lightColor;
+    float diff=Kd*max(dot(norm,lightDir),0.0);
+    float spec=Ks*pow(max(dot(viewDir,reflectDir),0.0),n);
+    vec3 result=(ambient+diff+spec)*objectColor;
+    FragColor = vec4(result, 1.0);
 }

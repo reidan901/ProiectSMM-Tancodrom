@@ -1,6 +1,6 @@
 #pragma once
 #define SHADER_H
-#include <glm/glm.hpp>
+#include <glm.hpp>
 #include <GL/glew.h>
 
 #include <string>

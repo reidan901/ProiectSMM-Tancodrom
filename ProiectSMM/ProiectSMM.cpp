@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <math.h> 
 
+#include <stb_image.h>
+
 #include <GL/glew.h>
 
 #include <GLM.hpp>
@@ -19,6 +21,7 @@
 #include "Loader.h"
 #include "Mesh.h"
 #include "Model.h"
+#include <vector>
 
 #pragma comment (lib, "glfw3dll.lib")
 #pragma comment (lib, "glew32.lib")
@@ -37,7 +40,38 @@ void Cleanup()
 	delete pCamera;
 }
 
+unsigned int loadSkybox(std::vector<std::string> faces)
+{
+	unsigned int textureID;
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+	stbi_set_flip_vertically_on_load(false);
+	int width, height, nrChannels;
+	for (unsigned int i = 0; i < faces.size(); i++)
+	{
+		unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+		if (data)
+		{
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+				0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
+			);
+			stbi_image_free(data);
+		}
+		else
+		{
+			std::cout << "Cubemap tex failed to load at path: " << faces[i] << std::endl;
+			stbi_image_free(data);
+		}
+	}
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
+	return textureID;
+
+}
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -127,83 +161,14 @@ int main()
 
 	glEnable(GL_DEPTH_TEST);
 
-	//// set up vertex data (and buffer(s)) and configure vertex attributes
-	//float vertices[] = {
-	//   -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	//   0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	//   0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	//   0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	//   -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-	//   -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-
-	//   -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-	//   0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-	//   0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-	//   0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-	//   -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-	//   -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-
-	//   -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-	//   -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-	//   -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-	//   -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-	//   -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-	//   -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-
-	//   0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-	//   0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-	//   0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-	//   0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-	//   0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-	//   0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-
-	//   -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-	//   0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-	//   0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-	//   0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-	//   -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-	//   -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-
-	//   -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-	//   0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-	//   0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-	//   0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-	//   -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-	//   -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
-	//};
-	//// first, configure the cube's VAO (and VBO)
-	//unsigned int VBO, cubeVAO;
-	//glGenVertexArrays(1, &cubeVAO);
-	//glGenBuffers(1, &VBO);
-
-	//glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	//glBindVertexArray(cubeVAO);
-
-	//// position attribute
-	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-	//glEnableVertexAttribArray(0);
-	//// normal attribute
-	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-	//glEnableVertexAttribArray(1);
-
-	//// second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
-	//unsigned int lightVAO;
-	//glGenVertexArrays(1, &lightVAO);
-	//glBindVertexArray(lightVAO);
-
-	//glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	//// note that we update the lamp's position attribute's stride to reflect the updated buffer data
-	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-	//glEnableVertexAttribArray(0);
-
 	// Create camera
 	pCamera = new Camera(SCR_WIDTH, SCR_HEIGHT, glm::vec3(0.0, 10.0, 13.0));
 
-	glm::vec3 lightPos(0.0f, 0.0f, 2.0f);
+	Shader lightingShader("PhongLight.vs","PhongLight.fs");
+	Shader modelShader("model.vs", "model.fs");
+	Shader skyboxShader("shaderSkybox.vs", "shaderSkybox.fs");
+	Shader lampShader("Lamp.fs", "Lamp.vs");
 
-	Shader lightingShader("model.vs", "model.fs");
 	//Shader lampShader("Lamp.vs", "Lamp.fs");
 	std::vector<std::vector<Mesh>> meshes;
 	std::vector<std::string> paths;
@@ -213,11 +178,162 @@ int main()
 	paths.push_back(pathname2);
 	for (int i = 0; i < paths.size(); i++)
 	{
-		meshes.push_back(Loader::LoadObj( paths[i]));
+		meshes.push_back(Loader::LoadObj(paths[i]));
 	}
 	
 	Model myModel(meshes[0]);
 	Model model2(meshes[1]);
+
+	//sun
+	float verticesSun[] = {
+	   -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+	   0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+	   0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+	   0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+	   -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+	   -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+
+	   -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+	   0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+	   0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+	   0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+	   -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+	   -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+
+	   -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+	   -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+	   -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+	   -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+	   -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+	   -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+
+	   0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+	   0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+	   0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+	   0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+	   0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+	   0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+
+	   -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+	   0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+	   0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+	   0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+	   -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+	   -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+
+	   -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+	   0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+	   0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+	   0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+	   -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+	   -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
+	};
+
+	unsigned int VBO, cubeVAO;
+	glGenVertexArrays(1, &cubeVAO);
+	glGenBuffers(1, &VBO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(verticesSun), verticesSun, GL_STATIC_DRAW);
+
+	glBindVertexArray(cubeVAO);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+
+	unsigned int lightVAO;
+	glGenVertexArrays(1, &lightVAO);
+	glBindVertexArray(lightVAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	glm::vec3 lightPos(1.0f, 1.0f, 2.0f);
+
+	//skybox
+	float skyboxVertices[] = {
+		// positions          
+		-1.0f,  1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		-1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f
+	};
+
+	std::vector<std::string> faces1 {
+		"..\\SkyboxDay\\Right.bmp",			//1
+			"..\\SkyboxDay\\Left.bmp",		//2
+			"..\\SkyboxDay\\Top.bmp",		//3
+			"..\\SkyboxDay\\Bottom.bmp",	//4
+			"..\\SkyboxDay\\Front.bmp",		//5
+			"..\\SkyboxDay\\Back.bmp"		//6
+	};
+
+	std::vector<std::string> faces2{
+		"..\\SkyboxNight\\1.png",			//1
+			"..\\SkyboxNight\\2.png",		//2
+			"..\\SkyboxNight\\3.png",		//3
+			"..\\SkyboxNight\\4.png",		//4
+			"..\\SkyboxNight\\5.png",		//5
+			"..\\SkyboxNight\\6.png"		//6
+	};
+
+	unsigned int cubemapTexture1 = loadSkybox(faces1);
+	unsigned int cubemapTexture2 = loadSkybox(faces2);
+
+	//VBO skybox
+	unsigned int skyboxVBO;
+	glGenBuffers(1, &skyboxVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), skyboxVertices, GL_STATIC_DRAW);
+	//VAO skybox
+	unsigned int skyboxVAO;
+	glGenVertexArrays(1, &skyboxVAO);
+	glBindVertexArray(skyboxVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), skyboxVertices, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
 
 	// render loop
 	while (!glfwWindowShouldClose(window)) {
@@ -231,46 +347,63 @@ int main()
 
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		
+		glDepthMask(GL_FALSE);
+		skyboxShader.Use();
 
-		lightingShader.Use();
-		/*lightingShader.SetVec3("objectColor", 0.5f, 1.0f, 0.31f);
-		lightingShader.SetVec3("lightColor", 1.0f, 1.0f, 1.0f);
-		lightingShader.SetVec3("lightPos", lightPos);
-		lightingShader.SetVec3("viewPos", pCamera->GetPosition());
-		lightingShader.setFloat("Ka", Ka);
-		lightingShader.setFloat("Kd", Kd);
-		lightingShader.setFloat("Ks", Ks);
-		lightingShader.setFloat("n", n);*/
+		glm::mat4 viewSkybox = glm::mat4(glm::mat3(pCamera->GetViewMatrix()));
+		glm::mat4 projectionSkybox = pCamera->GetProjectionMatrix();
 
+		skyboxShader.SetMat4("projection", projectionSkybox);
+		skyboxShader.SetMat4("view", viewSkybox);
+		glUniform1i(glGetUniformLocation(skyboxShader.ID, "skybox"), 0);
+		glUniform1i(glGetUniformLocation(skyboxShader.ID, "skybox2"), 1);
 
-		lightingShader.SetMat4("projection", pCamera->GetProjectionMatrix());
-		lightingShader.SetMat4("view", pCamera->GetViewMatrix());
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture1);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture2);
+		
+		glBindVertexArray(skyboxVAO);
+		
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glDepthMask(GL_TRUE);
+		glActiveTexture(GL_TEXTURE0);
+
+		static double lightMovementRadius = 5.0f;
+		lightPos.x = lightMovementRadius * glm::sin(currentFrame);
+		lightPos.y = lightMovementRadius * glm::cos(currentFrame);
+		
+		modelShader.Use();
+		modelShader.SetMat4("projection", pCamera->GetProjectionMatrix());
+		modelShader.SetMat4("view", pCamera->GetViewMatrix());
 
 		glm::mat4 model = glm::scale(glm::mat4(1.0), glm::vec3(33.0f));
-		lightingShader.SetMat4("model", model);
-		myModel.Draw(lightingShader);
-		model2.Draw(lightingShader);
-		//// render the cube
-		//glBindVertexArray(cubeVAO);
-		//glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		//glDrawArrays(GL_TRIANGLES, 0, 36);
+		modelShader.SetMat4("model", model);
+		model2.Draw(modelShader);
+		
+		glm::mat4 model1 = glm::scale(glm::mat4(1.0), glm::vec3(10.f, 10.f, 10.f));
+		modelShader.SetMat4("model", model1);
+		myModel.Draw(modelShader);
 
-		//static float lightMovementRadius = 1.0f;
-		//lightPos.x = glm::sin(currentFrame) * lightMovementRadius;
-		//lightPos.y = glm::cos(currentFrame) * lightMovementRadius;
+		//lamp
+		glBindVertexArray(cubeVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 
-		//// also draw the lamp object
-		//lampShader.Use();
-		//lampShader.SetMat4("projection", pCamera->GetProjectionMatrix());
-		//lampShader.SetMat4("view", pCamera->GetViewMatrix());
-		//model = glm::translate(glm::mat4(1.0), lightPos);
-		//model = glm::scale(model, glm::vec3(0.05f)); // a smaller cube
-		//lampShader.SetMat4("model", model);
+		lampShader.Use();
+		lampShader.SetMat4("projection", pCamera->GetProjectionMatrix());
+		lampShader.SetMat4("view", pCamera->GetViewMatrix());
+		
+		glm::mat4 modelLight = glm::scale(glm::mat4(1.0), glm::vec3(3.0f));
 
-		//glBindVertexArray(lightVAO);
-		//glDrawArrays(GL_TRIANGLES, 0, 36);
-
-		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
+		modelLight = glm::translate(glm::mat4(1.0), lightPos);
+		modelLight = glm::scale(modelLight, glm::vec3(0.05f));
+		lampShader.SetMat4("model", modelLight);
+		
+		glBindVertexArray(lightVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}

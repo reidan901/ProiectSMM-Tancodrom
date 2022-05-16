@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Skybox">
+      <UniqueIdentifier>{ed90e401-4d51-4f46-9d2c-40bba70f543e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ProiectSMM.cpp">
@@ -70,5 +73,31 @@
     <None Include="model.fs">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="shaderSkybox.vs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaderSkybox.fs">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\Skybox\Back.bmp">
+      <Filter>Skybox</Filter>
+    </Image>
+    <Image Include="..\Skybox\Bottom.bmp">
+      <Filter>Skybox</Filter>
+    </Image>
+    <Image Include="..\Skybox\Front.bmp">
+      <Filter>Skybox</Filter>
+    </Image>
+    <Image Include="..\Skybox\Left.bmp">
+      <Filter>Skybox</Filter>
+    </Image>
+    <Image Include="..\Skybox\Right.bmp">
+      <Filter>Skybox</Filter>
+    </Image>
+    <Image Include="..\Skybox\Top.bmp">
+      <Filter>Skybox</Filter>
+    </Image>
   </ItemGroup>
 </Project>
