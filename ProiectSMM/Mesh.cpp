@@ -15,6 +15,7 @@ void Mesh::Draw(Shader& shader)
     glUniform1i(glGetUniformLocation(shader.ID, std::string("Texture").c_str()), 0);
     // and finally bind the texture
     glBindTexture(GL_TEXTURE_2D, MeshMaterial.textureID);
+    SetMaterialUniforms(shader);
 
     // draw mesh
     glBindVertexArray(VAO);
@@ -23,6 +24,14 @@ void Mesh::Draw(Shader& shader)
 
     // always good practice to set everything back to defaults once configured.
     glActiveTexture(GL_TEXTURE0);
+}
+
+void Mesh::SetMaterialUniforms(Shader& shader)
+{
+    shader.SetVec3("material.ambient", MeshMaterial.Ka);
+    shader.SetVec3("material.diffuse", MeshMaterial.Kd);
+    shader.SetVec3("material.specular", MeshMaterial.Ks);
+    shader.SetFloat("material.shininess", MeshMaterial.shininess);
 }
 
 void Mesh::setupMesh()

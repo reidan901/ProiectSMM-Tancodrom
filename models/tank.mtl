@@ -8,7 +8,7 @@ Ks 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd C:\Users\vladb\Desktop\ProiectSMM-Tancodrom\models\tanktrack.jpg
+map_Kd C:\smm\ProiectSMM-Tancodrom\models\tanktrack.jpg
 
 newmtl Material_1.003
 Ns 96.078431
@@ -18,4 +18,4 @@ Ks 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd  C:\Users\vladb\Desktop\ProiectSMM-Tancodrom\models\tank.hdr
+map_Kd  C:\smm\ProiectSMM-Tancodrom\models\tank.hdr

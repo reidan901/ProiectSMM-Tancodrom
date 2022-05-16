@@ -10,6 +10,7 @@ struct Material {
 
 struct Light {
     vec3 position;
+
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
@@ -26,6 +27,7 @@ uniform sampler2D Texture;
 
 void main()
 {
+    vec3 color = texture(Texture, TexCoords).rgb;
     vec3 ambient = light.ambient * material.ambient;
 
     vec3 norm = normalize(Normal);
@@ -38,6 +40,7 @@ void main()
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
     vec3 specular = light.specular * (spec * material.specular);  
         
-    vec3 result = ambient + diffuse + specular;
-    FragColor = texture(Texture, TexCoords);
+    vec3 result1 = ambient + diffuse + specular;
+    vec3 result =result1*color;
+    FragColor = vec4(result,1);
 } 

@@ -167,13 +167,13 @@ int main()
 	Shader lightingShader("PhongLight.vs","PhongLight.fs");
 	Shader modelShader("model.vs", "model.fs");
 	Shader skyboxShader("shaderSkybox.vs", "shaderSkybox.fs");
-	Shader lampShader("Lamp.fs", "Lamp.vs");
+	Shader lampShader("Lamp.vs", "Lamp.fs");
 
 	//Shader lampShader("Lamp.vs", "Lamp.fs");
 	std::vector<std::vector<Mesh>> meshes;
 	std::vector<std::string> paths;
-	std::string pathname1 = "Tiger_I.obj";
-	std::string pathname2 = "Landscape-1.obj";
+	std::string pathname1 = "../models/tank.obj";
+	std::string pathname2 = "../models/Landscape-1.obj";
 	paths.push_back(pathname1);
 	paths.push_back(pathname2);
 	for (int i = 0; i < paths.size(); i++)
@@ -373,23 +373,10 @@ int main()
 		static double lightMovementRadius = 5.0f;
 		lightPos.x = lightMovementRadius * glm::sin(currentFrame);
 		lightPos.y = lightMovementRadius * glm::cos(currentFrame);
-		
-		modelShader.Use();
-		modelShader.SetMat4("projection", pCamera->GetProjectionMatrix());
-		modelShader.SetMat4("view", pCamera->GetViewMatrix());
-
-		glm::mat4 model = glm::scale(glm::mat4(1.0), glm::vec3(33.0f));
-		modelShader.SetMat4("model", model);
-		model2.Draw(modelShader);
-		
-		glm::mat4 model1 = glm::scale(glm::mat4(1.0), glm::vec3(10.f, 10.f, 10.f));
-		modelShader.SetMat4("model", model1);
-		myModel.Draw(modelShader);
-
 		//lamp
-		glBindVertexArray(cubeVAO);
+		/*glBindVertexArray(cubeVAO);
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glDrawArrays(GL_TRIANGLES, 0, 36);*/
 
 		lampShader.Use();
 		lampShader.SetMat4("projection", pCamera->GetProjectionMatrix());
@@ -398,23 +385,41 @@ int main()
 		glm::mat4 modelLight = glm::scale(glm::mat4(1.0), glm::vec3(3.0f));
 
 		modelLight = glm::translate(glm::mat4(1.0), lightPos);
-		modelLight = glm::scale(modelLight, glm::vec3(0.05f));
+		modelLight = glm::translate(modelLight, glm::vec3(0, 110.f, 0.f));
 		lampShader.SetMat4("model", modelLight);
 		
 		glBindVertexArray(lightVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
+
+		modelShader.Use();
+		modelShader.SetMat4("projection", pCamera->GetProjectionMatrix());
+		modelShader.SetMat4("view", pCamera->GetViewMatrix());
+
+		glm::mat4 model = glm::scale(glm::mat4(1.0), glm::vec3(20.f));
+		modelShader.SetMat4("model", model);
+		model2.Draw(modelShader);
+
+		glm::mat4 model1 = glm::scale(glm::mat4(1.0), glm::vec3(10.f, 10.f, 10.f));
+		modelShader.SetMat4("model", model1);
+		modelShader.SetVec3("viewPos", pCamera->GetPosition());
+		// light properties
+		glm::vec3 lightColor;
+		lightColor.x = 1;
+		lightColor.y = 1;
+		lightColor.z = 1;
+		glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f); // decrease the influence
+		glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // low influence
+		modelShader.SetVec3("light.ambient", ambientColor);
+		modelShader.SetVec3("light.diffuse", diffuseColor);
+		modelShader.SetVec3("light.specular", 1.0f, 1.0f, 1.0f);
+		modelShader.SetVec3("light.position", lightPos);
+		myModel.Draw(modelShader);
 		
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
 
 	Cleanup();
-
-	/*glDeleteVertexArrays(1, &cubeVAO);
-	glDeleteVertexArrays(1, &lightVAO);
-	glDeleteBuffers(1, &VBO);*/
-
-	// glfw: terminate, clearing all previously allocated GLFW resources
 	glfwTerminate();
 	return 0;
 }

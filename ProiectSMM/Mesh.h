@@ -28,6 +28,7 @@ public:
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices);
     Mesh() = default;
     void Draw(Shader& shader);
+    void SetMaterialUniforms(Shader& shader);
 private:
     //  render data
     unsigned int VAO, VBO, EBO;
