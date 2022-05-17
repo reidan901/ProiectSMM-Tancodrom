@@ -131,14 +131,21 @@ int main()
 	std::vector<std::string> paths;
 	std::string pathname1 = "finalwall.obj";
 	std::string pathname2 = "Landscape-1.obj";
-	std::string pathname3 = "Tiger_I.obj";
+	std::string pathname3 = "../models/hejjli.obj";
 	std::string pathname4 = "tower.obj";
 	std::string pathname5 = "T-34.obj";
+	std::string pathname6 = "../models/helibody.obj";
+	std::string pathname7 = "../models/helitailrotor.obj";
+	std::string pathname8 = "../models/helitoprotor.obj";
+
 	paths.push_back(pathname1);
 	paths.push_back(pathname2);
 	paths.push_back(pathname3);
 	paths.push_back(pathname4);
 	paths.push_back(pathname5);
+	paths.push_back(pathname6);
+	paths.push_back(pathname7);
+	paths.push_back(pathname8);
 
 	for (int i = 0; i < paths.size(); i++)
 	{
@@ -150,6 +157,9 @@ int main()
 	Model tigerModel(meshes[2]);
 	Model towerModel(meshes[3]);
 	Model t34Model(meshes[4]);
+	Model heliBody(meshes[5]);
+	Model heliTopRotor(meshes[6]);
+	Model heliTailRotor(meshes[7]);
 
 	//sun
 	float verticesSun[] = {
@@ -455,11 +465,18 @@ int main()
 		landscapeModel.Draw(modelShader);
 
 		//Tank
-		scaleModel = glm::scale(glm::mat4(1.0), glm::vec3(10.f));
-		glm::mat4 posModel = glm::translate(scaleModel, glm::vec3(4.f, 0.f, -5.f));
-		modelShader.SetMat4("model", scaleModel);
+		glm::mat4 posModel = glm::translate(glm::mat4(1), glm::vec3(4.f, 0.f, -5.f));
 		modelShader.SetMat4("model", posModel);
 		tigerModel.Draw(modelShader);
+		heliBody.Draw(modelShader);
+		glm::mat4 topModel = glm::translate(glm::mat4(1), glm::vec3(4.f, 0.f, -5.f));
+		topModel= glm::rotate(topModel, (float)currentFrame*5, glm::vec3(0, 1, 0));
+		modelShader.SetMat4("model", topModel);
+		heliTailRotor.Draw(modelShader);
+		glm::mat4 tailModel;
+		tailModel = glm::translate(tailModel, glm::vec3(4.f, 0.f, -5.f));
+		modelShader.SetMat4("model", tailModel);
+		heliTopRotor.Draw(modelShader);
 
 		scaleModel = glm::scale(glm::mat4(1.0), glm::vec3(10.f));
 		posModel = glm::translate(scaleModel, glm::vec3(-3.f, 0.f, -4.f));
