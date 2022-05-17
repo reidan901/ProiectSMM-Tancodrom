@@ -11,11 +11,9 @@ struct Vertex {
 
 struct Material {
     std::string name;
-    glm::vec3 Ka;
-    glm::vec3 Kd;
-    glm::vec3 Ks;
     float shininess;
-    int textureID;
+    int diffusetextureID;
+    int speculartextureID;
 };
 class Mesh
 {
@@ -28,7 +26,6 @@ public:
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices);
     Mesh() = default;
     void Draw(Shader& shader);
-    void SetMaterialUniforms(Shader& shader);
 private:
     //  render data
     unsigned int VAO, VBO, EBO;

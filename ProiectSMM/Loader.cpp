@@ -13,19 +13,11 @@ std::vector<Mesh> Loader::LoadObj(std::string& pathname)
     for (auto mat : loader.LoadedMaterials)
     {
         Material temp;
-        temp.Ka = glm::vec3(mat.Ka.X,
-            mat.Ka.Y,
-            mat.Ka.Z);
-        temp.Kd = glm::vec3(mat.Kd.X,
-            mat.Kd.Y,
-            mat.Kd.Z);
-        temp.Ks = glm::vec3(mat.Ks.X,
-            mat.Ks.Y,
-            mat.Ks.Z);
+        temp.diffusetextureID = TextureUtilites::LoadTexture(mat.map_Kd);
         temp.shininess = mat.Ns;
         temp.name = mat.name;
-        if(mat.map_Kd!="")
-        temp.textureID = TextureUtilites::LoadTexture(mat.map_Kd);
+        if (mat.map_Ks != "")
+            temp.speculartextureID = TextureUtilites::LoadTexture(mat.map_Ks);
         materials.push_back(temp);
     }
         

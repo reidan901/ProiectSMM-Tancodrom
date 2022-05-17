@@ -90,46 +90,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		pCamera->Reset(width, height);
 
 	}
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && Ka < 1.f)
-	{
-		Ka = Ka + 0.1f;
-		std::cout << Ka << '\n';
-	}
-	if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS && Ka > 0.2f)
-	{
-		Ka = Ka - 0.1f;
-		std::cout << Ka << '\n';
-	}
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && Kd < 1.f)
-	{
-		Kd = Kd + 0.1f;
-		std::cout << Kd << '\n';
-	}
-	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS && Kd > 0.2f)
-	{
-		Kd = Kd - 0.1f;
-		std::cout << Kd << '\n';
-	}
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && Ks < 1.f)
-	{
-		Ks = Ks + 0.1f;
-		std::cout << Ks << '\n';
-	}
-	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && Ks > 0.2f)
-	{
-		Ks = Ks - 0.1f;
-		std::cout << Ks << '\n';
-	}
-	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS && n < 256)
-	{
-		n *= 2;
-		std::cout << n << '\n';
-	}
-	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS && n != 1)
-	{
-		n /= 2;
-		std::cout << n << '\n';
-	}
 }
 
 int main()
@@ -163,19 +123,20 @@ int main()
 
 	// Create camera
 	pCamera = new Camera(SCR_WIDTH, SCR_HEIGHT, glm::vec3(0.0, 10.0, 13.0));
-
-	Shader lightingShader("PhongLight.vs","PhongLight.fs");
 	Shader modelShader("model.vs", "model.fs");
 	Shader skyboxShader("shaderSkybox.vs", "shaderSkybox.fs");
 	Shader lampShader("Lamp.vs", "Lamp.fs");
 
-	//Shader lampShader("Lamp.vs", "Lamp.fs");
 	std::vector<std::vector<Mesh>> meshes;
 	std::vector<std::string> paths;
-	std::string pathname1 = "Tiger-1.obj";
-	std::string pathname2 = "Landscape-1.obj";
+	std::string pathname1 = "../models/finalwall.obj";
+	std::string pathname2 = "../models/Landscape-1.obj";
+	std::string pathname3 = "../models/tank.obj";
+	std::string pathname4 = "../models/tower.obj";
 	paths.push_back(pathname1);
 	paths.push_back(pathname2);
+	paths.push_back(pathname3);
+	paths.push_back(pathname4);
 	for (int i = 0; i < paths.size(); i++)
 	{
 		meshes.push_back(Loader::LoadObj(paths[i]));
@@ -183,6 +144,8 @@ int main()
 	
 	Model myModel(meshes[0]);
 	Model model2(meshes[1]);
+	Model tankModel(meshes[2]);
+	Model towerModel(meshes[3]);
 
 	//sun
 	float verticesSun[] = {
@@ -382,9 +345,9 @@ int main()
 		glDepthMask(GL_TRUE);
 		glActiveTexture(GL_TEXTURE0);
 
-		static double lightMovementRadius = 600.0f;
+		static double lightMovementRadius = 300.0f;
 		lightPos.y = lightMovementRadius * glm::sin(currentFrame*0.3);
-		lightPos.x = lightMovementRadius * glm::cos(currentFrame*0.3); 
+		lightPos.x = lightMovementRadius * glm::cos(currentFrame*0.3);
 		//lamp
 		/*glBindVertexArray(cubeVAO);
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -397,24 +360,13 @@ int main()
 		glm::mat4 modelLight = glm::scale(glm::mat4(1.0), glm::vec3(3.0f));
 
 		modelLight = glm::translate(glm::mat4(1.0), lightPos);
-		//modelLight = glm::translate(modelLight, glm::vec3(0, 110.f, 0.f));
 		lampShader.SetMat4("model", modelLight);
 		
 		glBindVertexArray(lightVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		modelShader.Use();
-		modelShader.SetMat4("projection", pCamera->GetProjectionMatrix());
-		modelShader.SetMat4("view", pCamera->GetViewMatrix());
-
-		glm::mat4 model = glm::scale(glm::mat4(1.0), glm::vec3(20.f));
-		modelShader.SetMat4("model", model);
-		model2.Draw(modelShader);
-
-		glm::mat4 model1 = glm::scale(glm::mat4(1.0), glm::vec3(10.f, 10.f, 10.f));
-		modelShader.SetMat4("model", model1);
-		modelShader.SetVec3("viewPos", pCamera->GetPosition());
-		// light properties
+		/* light properties*/
 		if (glm::cos(currentFrame * 0.3) < 1.f && glm::cos(currentFrame * 0.3) > 0.f )
 		{
 			if (mixValue < 0)
@@ -474,14 +426,29 @@ int main()
 				lightColor.y = lightColor.y - 0.0001;
 			}
 		}
-		
-		glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f); // decrease the influence
-		glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // low influence
+		glm::vec3 diffuseColor = lightColor; // decrease the influence
+		glm::vec3 ambientColor = lightColor*glm::vec3(0.1f); // low influence
+		modelShader.SetVec3("viewPos", pCamera->GetPosition());
 		modelShader.SetVec3("light.ambient", ambientColor);
 		modelShader.SetVec3("light.diffuse", diffuseColor);
 		modelShader.SetVec3("light.specular", 1.0f, 1.0f, 1.0f);
 		modelShader.SetVec3("light.position", lightPos);
+		modelShader.SetMat4("projection", pCamera->GetProjectionMatrix());
+		modelShader.SetMat4("view", pCamera->GetViewMatrix());
+		
+
+		glm::mat4 model1 = glm::scale(glm::mat4(1.0), glm::vec3(10.f, 10.f, 10.f));
+		modelShader.SetMat4("model", model1);
+	
 		myModel.Draw(modelShader);
+		glm::mat4 model = glm::scale(glm::mat4(1.0), glm::vec3(20.f));
+		modelShader.SetMat4("model", model);
+		model2.Draw(modelShader);
+		glm::mat4 model2 = glm::scale(glm::mat4(1.0), glm::vec3(9.f));
+		modelShader.SetMat4("model", model2);
+		tankModel.Draw(modelShader);
+		modelShader.SetMat4("model", model2);
+		towerModel.Draw(modelShader);
 		
 		glfwSwapBuffers(window);
 		glfwPollEvents();
