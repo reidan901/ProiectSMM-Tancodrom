@@ -129,23 +129,27 @@ int main()
 
 	std::vector<std::vector<Mesh>> meshes;
 	std::vector<std::string> paths;
-	std::string pathname1 = "../models/finalwall.obj";
-	std::string pathname2 = "../models/Landscape-1.obj";
-	std::string pathname3 = "../models/tank.obj";
-	std::string pathname4 = "../models/tower.obj";
+	std::string pathname1 = "finalwall.obj";
+	std::string pathname2 = "Landscape-1.obj";
+	std::string pathname3 = "Tiger_I.obj";
+	std::string pathname4 = "tower.obj";
+	std::string pathname5 = "T-34.obj";
 	paths.push_back(pathname1);
 	paths.push_back(pathname2);
 	paths.push_back(pathname3);
 	paths.push_back(pathname4);
+	paths.push_back(pathname5);
+
 	for (int i = 0; i < paths.size(); i++)
 	{
 		meshes.push_back(Loader::LoadObj(paths[i]));
 	}
 	
-	Model myModel(meshes[0]);
-	Model model2(meshes[1]);
-	Model tankModel(meshes[2]);
+	Model wallModel(meshes[0]);
+	Model landscapeModel(meshes[1]);
+	Model tigerModel(meshes[2]);
 	Model towerModel(meshes[3]);
+	Model t34Model(meshes[4]);
 
 	//sun
 	float verticesSun[] = {
@@ -436,19 +440,39 @@ int main()
 		modelShader.SetMat4("projection", pCamera->GetProjectionMatrix());
 		modelShader.SetMat4("view", pCamera->GetViewMatrix());
 		
+		//Wall
+		glm::mat4 scaleModel = glm::scale(glm::mat4(1.0), glm::vec3(10.f, 10.f, 10.f));
+		modelShader.SetMat4("model", scaleModel);	
+		wallModel.Draw(modelShader);
 
-		glm::mat4 model1 = glm::scale(glm::mat4(1.0), glm::vec3(10.f, 10.f, 10.f));
-		modelShader.SetMat4("model", model1);
-	
-		myModel.Draw(modelShader);
-		glm::mat4 model = glm::scale(glm::mat4(1.0), glm::vec3(20.f));
-		modelShader.SetMat4("model", model);
-		model2.Draw(modelShader);
-		glm::mat4 model2 = glm::scale(glm::mat4(1.0), glm::vec3(9.f));
-		modelShader.SetMat4("model", model2);
-		tankModel.Draw(modelShader);
-		modelShader.SetMat4("model", model2);
+		//Tower
+		modelShader.SetMat4("model", scaleModel);
 		towerModel.Draw(modelShader);
+
+		//Landscape
+		scaleModel = glm::scale(glm::mat4(1.0), glm::vec3(20.f));
+		modelShader.SetMat4("model", scaleModel);
+		landscapeModel.Draw(modelShader);
+
+		//Tank
+		scaleModel = glm::scale(glm::mat4(1.0), glm::vec3(10.f));
+		glm::mat4 posModel = glm::translate(scaleModel, glm::vec3(4.f, 0.f, -5.f));
+		modelShader.SetMat4("model", scaleModel);
+		modelShader.SetMat4("model", posModel);
+		tigerModel.Draw(modelShader);
+
+		scaleModel = glm::scale(glm::mat4(1.0), glm::vec3(10.f));
+		posModel = glm::translate(scaleModel, glm::vec3(-3.f, 0.f, -4.f));
+		modelShader.SetMat4("model", scaleModel);
+		modelShader.SetMat4("model", posModel);
+		tigerModel.Draw(modelShader);
+
+		scaleModel = glm::scale(glm::mat4(1.0), glm::vec3(10.f));
+		posModel = glm::translate(scaleModel, glm::vec3(-2.f, 1.4f, 12.f));
+		modelShader.SetMat4("model", scaleModel);
+		modelShader.SetMat4("model", posModel);
+		t34Model.Draw(modelShader);
+
 		
 		glfwSwapBuffers(window);
 		glfwPollEvents();

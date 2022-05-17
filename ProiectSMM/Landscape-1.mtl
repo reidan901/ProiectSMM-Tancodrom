@@ -10,6 +10,5 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Bump farm-landscape\\source\\Landscape Normal.png
-map_Kd field.jpeg
-map_Ns farm-landscape\\source\\Landscape Roughness.png
+map_Kd Grass_002_0000_DIFFUSE.jpg
+map_Ks Grass_002_0001_SPEC.jpg
