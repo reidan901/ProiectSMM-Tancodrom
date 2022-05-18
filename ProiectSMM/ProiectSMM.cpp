@@ -137,6 +137,7 @@ int main()
 	std::string pathname6 = "helibody.obj";
 	std::string pathname7 = "helitailrotor.obj";
 	std::string pathname8 = "helitoprotor.obj";
+	std::string pathname9 = "forest.obj";
 
 	paths.push_back(pathname1);
 	paths.push_back(pathname2);
@@ -146,6 +147,7 @@ int main()
 	paths.push_back(pathname6);
 	paths.push_back(pathname7);
 	paths.push_back(pathname8);
+	paths.push_back(pathname9);
 
 	for (int i = 0; i < paths.size(); i++)
 	{
@@ -160,6 +162,7 @@ int main()
 	Model heliBody(meshes[5]);
 	Model heliTopRotor(meshes[6]);
 	Model heliTailRotor(meshes[7]);
+	Model forestModel(meshes[8]);
 
 	//sun
 	float verticesSun[] = {
@@ -387,7 +390,7 @@ int main()
 			}
 			else
 			{
-				mixValue -= 0.00012;
+				mixValue -= 0.0012;
 			}
 
 			if (lightColor.x < 0.858)
@@ -416,7 +419,7 @@ int main()
 			}
 			else
 			{
-				mixValue += 0.0002;
+				mixValue += 0.002;
 			}
 			
 
@@ -501,6 +504,11 @@ int main()
 		modelShader.SetMat4("model", posModel);
 		t34Model.Draw(modelShader);
 
+		scaleModel = glm::scale(glm::mat4(1.0), glm::vec3(20.f));
+		//posModel = glm::translate(scaleModel, glm::vec3(-2.f, 1.4f, 12.f));
+		modelShader.SetMat4("model", scaleModel);
+		//modelShader.SetMat4("model", posModel);
+		forestModel.Draw(modelShader);
 		
 		glfwSwapBuffers(window);
 		glfwPollEvents();
