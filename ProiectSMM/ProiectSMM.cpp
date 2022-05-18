@@ -33,7 +33,7 @@ float Ka = 0.9f;
 float Kd = 0.9f;
 float Ks = 2.0f;
 float n = 0.0f;
-unsigned int SCR_WIDTH=800, SCR_HEIGHT=600;
+unsigned int SCR_WIDTH=1920, SCR_HEIGHT=1080;
 
 void Cleanup()
 {
@@ -100,7 +100,8 @@ int main()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// glfw window creation
-	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Tancodrom", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Tancodrom", glfwGetPrimaryMonitor(), NULL);
+
 	if (window == NULL) {
 		std::cout << "Failed to create GLFW window" << std::endl;
 		glfwTerminate();
@@ -130,12 +131,12 @@ int main()
 	std::vector<std::string> paths;
 	std::string pathname1 = "finalwall.obj";
 	std::string pathname2 = "Landscape-1.obj";
-	std::string pathname3 = "../models/hejjli.obj";
+	std::string pathname3 = "Tiger_I.obj";
 	std::string pathname4 = "tower.obj";
-	std::string pathname5 = "Tiger_I.obj";
-	std::string pathname6 = "../models/helibody.obj";
-	std::string pathname7 = "../models/helitailrotor.obj";
-	std::string pathname8 = "../models/helitoprotor.obj";
+	std::string pathname5 = "T-34.obj";
+	std::string pathname6 = "helibody.obj";
+	std::string pathname7 = "helitailrotor.obj";
+	std::string pathname8 = "helitoprotor.obj";
 
 	paths.push_back(pathname1);
 	paths.push_back(pathname2);
@@ -462,24 +463,34 @@ int main()
 		modelShader.SetMat4("model", scaleModel);
 		landscapeModel.Draw(modelShader);
 
-		//Tank
-		glm::mat4 posModel = glm::translate(glm::mat4(1), glm::vec3(4.f, 0.f, -5.f));
+		//Helicopter
+		glm::mat4 heliDim = glm::scale(glm::mat4(1.0), glm::vec3(10.f));
+		glm::mat4 posModel = glm::translate(heliDim, glm::vec3(4.f, 30.f, -5.f));
+		modelShader.SetMat4("model", heliDim);
 		modelShader.SetMat4("model", posModel);
-		tigerModel.Draw(modelShader);
 		heliBody.Draw(modelShader);
 
-		glm::mat4 topModel = glm::translate(glm::mat4(1), glm::vec3(4.f, 0.f, -5.f));
+		glm::mat4 topModel = glm::translate(heliDim, glm::vec3(4.f, 30.f, -5.f));
 		topModel= glm::rotate(topModel, (float)currentFrame*5, glm::vec3(0, 1, 0));
+		modelShader.SetMat4("model", heliDim);
 		modelShader.SetMat4("model", topModel);
 		heliTailRotor.Draw(modelShader);
 
 		glm::mat4 tailModel;
-		tailModel = glm::translate(tailModel, glm::vec3(4.f, 0.f, -5.f));
+		tailModel = glm::translate(heliDim, glm::vec3(4.f, 30.f, -5.f));
+		modelShader.SetMat4("model", heliDim);
 		modelShader.SetMat4("model", tailModel);
 		heliTopRotor.Draw(modelShader);
 
+		//Tanks
 		scaleModel = glm::scale(glm::mat4(1.0), glm::vec3(10.f));
-		posModel = glm::translate(scaleModel, glm::vec3(-3.f, 0.f, -4.f));
+		posModel = glm::translate(scaleModel, glm::vec3(-4.f, 0.f, -4.f));
+		modelShader.SetMat4("model", scaleModel);
+		modelShader.SetMat4("model", posModel);
+		tigerModel.Draw(modelShader);
+
+		scaleModel = glm::scale(glm::mat4(1.0), glm::vec3(10.f));
+		posModel = glm::translate(scaleModel, glm::vec3(3.f, 0.f, -4.f));
 		modelShader.SetMat4("model", scaleModel);
 		modelShader.SetMat4("model", posModel);
 		tigerModel.Draw(modelShader);
