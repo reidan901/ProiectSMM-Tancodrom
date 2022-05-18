@@ -31,8 +31,8 @@ GLuint ProjMatrixLocation, ViewMatrixLocation, WorldMatrixLocation;
 Camera* pCamera = nullptr;
 float Ka = 0.9f;
 float Kd = 0.9f;
-float Ks = 0.9f;
-float n = 1.f;
+float Ks = 2.0f;
+float n = 0.0f;
 unsigned int SCR_WIDTH=800, SCR_HEIGHT=600;
 
 void Cleanup()
@@ -88,7 +88,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		int width, height;
 		glfwGetWindowSize(window, &width, &height);
 		pCamera->Reset(width, height);
-
 	}
 }
 
@@ -133,7 +132,7 @@ int main()
 	std::string pathname2 = "Landscape-1.obj";
 	std::string pathname3 = "../models/hejjli.obj";
 	std::string pathname4 = "tower.obj";
-	std::string pathname5 = "T-34.obj";
+	std::string pathname5 = "Tiger_I.obj";
 	std::string pathname6 = "../models/helibody.obj";
 	std::string pathname7 = "../models/helitailrotor.obj";
 	std::string pathname8 = "../models/helitoprotor.obj";
@@ -352,21 +351,16 @@ int main()
 		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture1);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture2);
-		
 		glBindVertexArray(skyboxVAO);
-		
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glDepthMask(GL_TRUE);
 		glActiveTexture(GL_TEXTURE0);
 
-		static double lightMovementRadius = 300.0f;
+		static double lightMovementRadius = 600.0f;
 		lightPos.y = lightMovementRadius * glm::sin(currentFrame*0.3);
 		lightPos.x = lightMovementRadius * glm::cos(currentFrame*0.3);
-		//lamp
-		/*glBindVertexArray(cubeVAO);
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);*/
 
+		//lamp
 		lampShader.Use();
 		lampShader.SetMat4("projection", pCamera->GetProjectionMatrix());
 		lampShader.SetMat4("view", pCamera->GetViewMatrix());
@@ -380,7 +374,10 @@ int main()
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		modelShader.Use();
-		/* light properties*/
+
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+		//light properties (day - > night cycle)
 		if (glm::cos(currentFrame * 0.3) < 1.f && glm::cos(currentFrame * 0.3) > 0.f )
 		{
 			if (mixValue < 0)
@@ -389,7 +386,7 @@ int main()
 			}
 			else
 			{
-				mixValue -= 0.0001;
+				mixValue -= 0.00012;
 			}
 
 			if (lightColor.x < 0.858)
@@ -418,7 +415,7 @@ int main()
 			}
 			else
 			{
-				mixValue += 0.0003;
+				mixValue += 0.0002;
 			}
 			
 
@@ -428,7 +425,7 @@ int main()
 			}
 			else
 			{
-				lightColor.x = lightColor.x + 0.0001;
+				lightColor.x = lightColor.x + 0.00005;
 			}
 
 			if (lightColor.y < 0.466)
@@ -437,9 +434,10 @@ int main()
 			}
 			else
 			{
-				lightColor.y = lightColor.y - 0.0001;
+				lightColor.y = lightColor.y - 0.00005;
 			}
 		}
+
 		glm::vec3 diffuseColor = lightColor; // decrease the influence
 		glm::vec3 ambientColor = lightColor*glm::vec3(0.1f); // low influence
 		modelShader.SetVec3("viewPos", pCamera->GetPosition());
@@ -469,10 +467,12 @@ int main()
 		modelShader.SetMat4("model", posModel);
 		tigerModel.Draw(modelShader);
 		heliBody.Draw(modelShader);
+
 		glm::mat4 topModel = glm::translate(glm::mat4(1), glm::vec3(4.f, 0.f, -5.f));
 		topModel= glm::rotate(topModel, (float)currentFrame*5, glm::vec3(0, 1, 0));
 		modelShader.SetMat4("model", topModel);
 		heliTailRotor.Draw(modelShader);
+
 		glm::mat4 tailModel;
 		tailModel = glm::translate(tailModel, glm::vec3(4.f, 0.f, -5.f));
 		modelShader.SetMat4("model", tailModel);
