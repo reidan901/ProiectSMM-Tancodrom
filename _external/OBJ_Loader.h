@@ -617,7 +617,6 @@ namespace objl
 						int i = 2;
 						while(1) {
 							tempMesh.MeshName = meshname + "_" + std::to_string(i);
-
 							for (auto &m : LoadedMeshes)
 								if (m.MeshName == tempMesh.MeshName)
 									continue;
